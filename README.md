@@ -3,14 +3,12 @@
 > A lightweight, reusable toolkit for building Go backend applications.
 
 ![Version Badge Placeholder](https://img.shields.io/badge/version/1.0.0-007BCE?style=flat)
-[![Go Version](https://img.shields.io/badge/go-1.21+-007BCE.svg)](https://golang.org/dl/)
+[![Go Version](https://img.shields.io/badge/go-1.27+-007BCE.svg)](https://golang.org/dl/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
 
 ## ✨ Features
-
-- **Configuration**: Centralized application configuration with environment-based settings
 - **HTTP Client**: Reusable HTTP client initialization with configurable timeouts and sensible defaults
 - **Modular Design**: Keep utilities independent and easy to integrate into existing Go projects
 - **Extensible Architecture**: Designed to accommodate additional backend utilities over time
@@ -21,17 +19,13 @@
 
 ```
 gokit/
-├── config/
-│   ├── config.go
-│   └── config_test.go
 ├── httpclient/
-│   ├── client.go
-│   └── client_test.go
+│   ├── httpclient.go
+│   └── httpclinet_test.go
 ├── examples/
-│   └── basic/
+│   └── examples.go
 ├── go.mod
 ├── go.sum
-├── LICENSE
 └── README.md
 ```
 
@@ -55,69 +49,95 @@ Import only the packages you need:
 
 ```go
 import (
-    "github.com/<your-username>/gokit/config"
     "github.com/<your-username>/gokit/httpclient"
-    "github.com/<your-username>/gokit/postgres"
 )
-```
-
-> ⚠️ The package APIs shown below are illustrative and will need to match the actual implementation.
-
----
-
-## 🔧 Configuration
-
-The `config` package provides a centralized way to load and manage application settings.
-
-### Potential Capabilities
-
-- Environment variable loading
-- Typed configuration values
-- Default values
-- Required-field validation
-- Clear error messages for missing or invalid configuration
-
-#### Example Configuration
-
-```go
-type Config struct {
-    AppEnv string
-    Port   int
-    DBURL  string
-}
-```
-
-**Example Environment Variables:**
-
-```bash
-APP_ENV=development
-PORT=8080
-DATABASE_URL="postgres://user:password@localhost:5432/appdb"
 ```
 
 ---
 
 ## 🌐 HTTP Client
 
-The `httpclient` package simplifies HTTP client initialization with reusable configuration and safe defaults.
+The `httpclient` package provides reusable HTTP client initialization and request handling.
 
-### Potential Capabilities
+### Basic Usage
 
-- Configurable request timeouts
-- Connection pooling through net/http
-- Custom transport configuration
-- Context-aware requests
-- Reusable clients across requests
-
-**Example Usage:**
+Initialize the HTTP client with environment configuration:
 
 ```go
-client := httpclient.New(
-    httpclient.WithTimeout(10*time.Second),
-)
+func main() {
+	client := gktHttpClient.InitHttpClient()
+
+	// Example 1: Simple GET request
+	status, err := client.Get(
+		context.TODO(), // Use applicable context
+		"api.example.com",
+		"https://api.example.com/users",
+		map[string]string{},
+		nil,
+		nil,
+	)
+	if err != nil {
+		log.Printf("GET failed: %v", err)
+		return
+	}
+
+	fmt.Printf("Status: %d\n", status.Status)
+	fmt.Printf("Body: %s\n", string(status.Body))
+
+	// Example 2: GET with parameters and headers
+	resp, err := client.Get(
+		context.TODO(), // Use applicable context
+		"api.example.com",
+		"https://api.example.com/search",
+		map[string]string{"X-API-Key": "your-api-key"},
+		&map[string]string{
+			"page":  "1",
+			"limit": "10",
+		},
+		nil,
+	)
+	if err != nil {
+		log.Printf("GET with params failed: %v", err)
+		return
+	}
+
+	fmt.Printf("Response with params: %s\n", string(resp.Body))
+
+	// Example 3: POST request with JSON body
+	jsonBody := map[string]interface{}{
+		"name":   "John Doe",
+		"email":  "john@example.com",
+		"active": true,
+	}
+
+	resp2, err := client.Post(
+		context.TODO(), // Use applicable context
+		"api.example.com",
+		"https://api.example.com/users",
+		map[string]string{"Content-Type": "application/json"},
+		jsonBody,
+		nil,
+	)
+	if err != nil {
+		log.Printf("POST failed: %v", err)
+		return
+	}
+
+	fmt.Printf("Status: %d\n", resp2.Status)
+	fmt.Printf("Response: %s\n", string(resp2.Body))
+
+	log.Println("HTTP client examples completed successfully!")
+}
 ```
 
-> ⚠️ The API above is a proposed interface, not a confirmed implementation.
+> 💡 The HTTP client allows you to:
+> - Initialize clients with environment configuration (timeout, CA certs)
+> - Perform GET and POST requests with headers and parameters
+> - Handle response status codes programmatically
+> - Support context-aware operations for graceful cancellation
+> - Manage request timeouts and connection pooling
+
+> ⚠️ The package APIs shown below are illustrative and will need to match the actual implementation.
 
 ---
 
@@ -127,7 +147,6 @@ client := httpclient.New(
 |----------|------------|
 | **Language** | Go |
 | **HTTP** | Go standard library (net/http) |
-| **Configuration** | Go standard library and environment variables |
 | **Testing** | Go testing package |
 | **CI/CD** | GitHub Actions |
 
