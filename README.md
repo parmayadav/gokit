@@ -38,7 +38,7 @@ gokit/
 Install the module using Go:
 
 ```bash
-go get github.com/parmayadav/gokit@v1.0.1
+go get github.com/parmayadav/gokit@v1.0.2
 ```
 
 Replace `<your-username>` with your GitHub username or organization.
