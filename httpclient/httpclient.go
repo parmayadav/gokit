@@ -13,7 +13,7 @@ import (
 	"os"
 	"time"
 
-	"gokit/core"
+	"github.com/parmayadav/gokit/core"
 )
 
 type HttpClient struct {

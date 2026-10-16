@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	gktHttpClient "gokit/httpclient"
+	gktHttpClient "github.com/parmayadav/gokit/httpclient"
 )
 
 func main() {
